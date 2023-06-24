@@ -1,0 +1,34 @@
+version: '3'
+services:
+  cms_vgsbooking_dev:
+    container_name: cms_vgsbooking_dev
+    build: .
+    volumes:
+      - ./env:/var/www/html/vgs_booking_control/.env:rw
+      - /etc/localtime:/etc/localtime:ro
+      - logs:/var/www/html/vgs_booking_control/storage/logs
+      - image:/var/www/html/vgs_booking_control/public/image
+    environment:
+        APPLICATION_ENV: Production
+    networks:
+      net:
+        ipv4_address: 10.14.7.3
+
+  cms_vgsbooking_redis:
+    restart: always
+    container_name: cms_vgsbooking_redis
+    image: redis:alpine
+    command: redis-server --requirepass t8u24sA9284dGLhS
+    networks:
+      net:
+        ipv4_address: 10.14.7.5
+
+volumes:
+  logs:
+  image:
+networks:
+ net:
+  ipam:
+   driver: default
+   config:
+   - subnet: 10.14.7.0/27

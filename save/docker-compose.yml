@@ -1,0 +1,27 @@
+version: '2'
+services:
+  cms-vgsbooking:
+    container_name: cms-vgsbooking
+    build: .
+    volumes:
+      - ./env:/var/www/html/vgs_upload_image/.env:rw
+      - /etc/localtime:/etc/localtime:ro
+      - logs:/var/www/html/vgs_upload_image/storage/logs
+
+    environment:
+        APPLICATION_ENV: Production
+    extra_hosts:
+      - "xx.vhandicap.com:10.198.28.2"
+    networks:
+      net:
+        ipv4_address: 10.211.6.2
+
+volumes:
+  logs:
+
+networks:
+ net:
+  ipam:
+   driver: default
+   config:
+   - subnet: 10.211.6.0/24

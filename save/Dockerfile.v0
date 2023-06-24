@@ -1,0 +1,52 @@
+FROM ubuntu:18.04
+# Update
+# Install supervisor
+# Install command line utils
+# Install supervisor
+RUN  apt-get -y update  && \
+     apt-get install -y curl mcrypt git 
+RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y php7.2 php7.2-bcmath php7.2-fpm  \
+     php7.2-mysql php7.2-gd php7.2-curl php7.2-intl php7.2-zip php7.2-mbstring php7.2-dom php7.2-xml unzip
+
+RUN mkdir /var/run/php /var/www  -p ; 
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer && \
+    chown www-data:www-data /usr/local/bin/composer && \
+    usermod -u 1000 www-data && \ 
+    chown -R www-data:www-data /var/www/
+
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan gitcode.golfervn.com > /root/.ssh/known_hosts
+
+ADD rsa.upload.vhandicap    /root/.ssh/id_rsa
+RUN chmod 600               /root/.ssh/id_rsa
+
+# Ports
+EXPOSE 80
+RUN mkdir -p '/var/www/html/'
+WORKDIR       /var/www/html/
+
+ARG CACHE_DATE=2016-112
+RUN git init
+RUN git clone  git@gitcode.golfervn.com:truongnx94/golfervn_project_upload_image.git
+
+WORKDIR      /var/www/html/golfervn_project_upload_image/
+RUN composer install
+
+# Time zone
+RUN cp -f /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime 
+
+ADD config/uploads.ini  /etc/php/7.2/fpm/conf.d/uploads.ini
+ADD config/uploads.ini  /etc/php/7.2/cli/conf.d/uploads.ini
+RUN mv .env.example .env
+
+##RUN git reset --hard; git pull ; npm install ; npm update; npm run prod
+
+# Start
+ARG CACHE_DATE=2016-5
+
+CMD ["php","artisan","serv","--host","0.0.0.0"]

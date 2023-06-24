@@ -1,0 +1,21 @@
+FROM alpine:3.10
+LABEL Maintainer="Nguyen Chinh <nchinh.vn@gmail.com>" \
+      Description="Lightweight container with Nodejs based on Alpine Linux."
+
+# Install packages
+RUN apk --no-cache add  git bash nodejs npm openssh ffmpeg
+ARG CACHE_DATE=2001
+
+RUN  mkdir -p /var/www/
+ADD  vbee_services_tts_poc_git /root/.ssh/id_rsa
+RUN  chmod 600 /root/.ssh/id_rsa 
+RUN  ssh-keyscan github.com    > /root/.ssh/known_hosts
+RUN  cd /var/www/  && git init &&  git clone -v git@github.com:DevStorevn/vbee_services_tts_poc.git 
+
+WORKDIR /var/www/vbee_services_tts_poc/
+ADD     env /var/www/vbee_services_tts_poc/.env
+RUN     npm install 
+RUN     npm install pm2
+
+# Let supervisord start nginx & php-fpm npm run start
+CMD ["npm", "run", "start"]

@@ -1,0 +1,39 @@
+version: '3'
+services:
+  cms-vgsbooking:
+    container_name: cms_vgsbooking_pro
+    build: .
+    volumes:
+      - ./env:/var/www/html/vgs_booking_control/.env:rw
+      - /etc/localtime:/etc/localtime:ro
+      - logs:/var/www/html/vgs_booking_control/storage/logs
+      - image:/var/www/html/vgs_booking_control/public/image
+    environment:
+        APPLICATION_ENV: Production
+    networks:
+      net:
+        ipv4_address: 10.14.7.2
+
+  cms_vgsbooking_2:
+    container_name: cms_vgsbooking_2
+    build: .
+    volumes:
+      - ./env:/var/www/html/vgs_booking_control/.env:rw
+      - /etc/localtime:/etc/localtime:ro
+      - logs:/var/www/html/vgs_booking_control/storage/logs
+      - image:/var/www/html/vgs_booking_control/public/image
+    environment:
+        APPLICATION_ENV: Production
+    networks:
+      net:
+        ipv4_address: 10.14.7.3
+
+volumes:
+  logs:
+  image:
+networks:
+ net:
+  ipam:
+   driver: default
+   config:
+   - subnet: 10.14.7.0/27
